@@ -245,12 +245,15 @@ else if(btn.classList.contains('regenBtn')) { const n = notes.find(x=>x.id===id)
 renderTagsBar();
         renderNotes();
 
-        document.getElementById('selectModeBtn').addEventListener('click', () => {
-            selectMode = !selectMode;
-            if (!selectMode) selectedNotes.clear();
-            renderNotes();
-            updateBulkActions();
-        });
+        const selectModeBtn = document.getElementById('selectModeBtn');
+        if (selectModeBtn) {
+            selectModeBtn.addEventListener('click', () => {
+                selectMode = !selectMode;
+                if (!selectMode) selectedNotes.clear();
+                renderNotes();
+                updateBulkActions();
+            });
+        }
 
     </script>
 </body>
