@@ -117,9 +117,9 @@
     <div class="edit-modal" id="editModal"><h2>Редактирование</h2><textarea id="editText"></textarea><div class="tag-input-wrapper" style="margin-top:15px"><input type="text" id="tagInput" placeholder="Теги через запятую"><button class="add-tag-btn" id="addTagBtn">+</button></div><div id="editTags" class="tags" style="margin-top:10px"></div><div class="controls"><button class="btn" id="cancelEdit">Отмена</button><button class="btn" id="saveEdit">Сохранить</button></div></div>
     <div class="toast" id="toast"></div>
     <script>
-        let API_KEY = localStorage.getItem('listenApiKey') || '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';
+        let API_KEY = localStorage.getItem('listenApiKey') || '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';
         if (!localStorage.getItem('listenApiKey')) {
-            localStorage.setItem('listenApiKey', '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');
+            localStorage.setItem('listenApiKey', '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');
         }
         let notes = JSON.parse(localStorage.getItem('listenNotes') || '[]');
         let currentNoteId = null, recognition = null, isRecording = false, searchQuery = '', tagFilter = '';
@@ -180,6 +180,13 @@ const sorted = [...pinned, ...unpinned];
                 c.addEventListener('dragend', () => { setTimeout(() => c.classList.remove('dragging'), 0); dragged = null; });
                 c.addEventListener('dragover', e => { e.preventDefault(); if (dragged && dragged !== c) { const r = c.getBoundingClientRect(); c.parentNode.insertBefore(dragged, e.clientY < r.top + r.height/2 ? c : c.nextSibling); } });
             });
+        };
+
+        const renderEditTags = (noteId) => {
+            const note = notes.find(n => n.id === noteId);
+            const tags = note?.tags || [];
+            const container = document.getElementById('editTags');
+            container.innerHTML = tags.map(t => `<span class="tag">${t}</span>`).join('');
         };
 
 const improveWithAI = async (text, noteId, customPrompt = '') => {
