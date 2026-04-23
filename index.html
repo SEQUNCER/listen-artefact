@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>LISTEN ARTEFAKT</title>
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+        :root { --bg: #0d0d0d; --surface: #1a1a1a; --surface-hover: #252525; --text: #e8e8e8; --text-dim: #666666; --accent: #e85d04; --border: #2a2a2a; --glow: rgba(232, 93, 4, 0.3); }
+        body { background: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; background-image: radial-gradient(ellipse at 20% 0%, rgba(232, 93, 4, 0.08) 0%, transparent 50%), radial-gradient(ellipse at 80% 100%, rgba(232, 93, 4, 0.05) 0%, transparent 50%); }
+        header { padding: 25px 20px; text-align: center; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: linear-gradient(180deg, var(--bg) 0%, rgba(13,13,13,0.95) 100%); z-index: 100; backdrop-filter: blur(10px); }
+        h1 { font-size: 1.4rem; font-weight: 200; letter-spacing: 6px; text-transform: uppercase; background: linear-gradient(135deg, var(--text) 0%, var(--accent) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        nav { display: flex; justify-content: center; gap: 8px; padding: 16px 20px; border-bottom: 1px solid var(--border); background: var(--surface); }
+        nav button { background: transparent; border: 1px solid var(--border); color: var(--text-dim); padding: 12px 24px; border-radius: 25px; cursor: pointer; font-size: 0.85rem; transition: all 0.3s ease; font-weight: 500; letter-spacing: 0.5px; }
+        nav button.active { background: var(--accent); color: #fff; border-color: var(--accent); box-shadow: 0 4px 15px var(--glow); }
+        nav button:not(.active):hover { border-color: var(--text-dim); color: var(--text); }
+        main { flex: 1; padding: 20px; max-width: 600px; width: 100%; margin: 0 auto; }
+        .view { display: none; }
+        .view.active { display: block; }
+        .input-area { background: var(--surface); border-radius: 20px; padding: 24px; margin-bottom: 24px; border: 1px solid var(--border); box-shadow: 0 8px 32px rgba(0,0,0,0.3); }
+        textarea { width: 100%; background: transparent; border: none; color: var(--text); font-size: 1.05rem; resize: none; min-height: 100px; outline: none; line-height: 1.7; }
+        textarea::placeholder { color: var(--text-dim); }
+        input[type="text"] { width: 100%; padding: 14px 16px; background: var(--bg); border: 1px solid var(--border); color: var(--text); border-radius: 12px; font-size: 0.95rem; transition: all 0.3s; }
+        input[type="text"]:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--glow); outline: none; }
+        .controls { display: flex; gap: 12px; margin-top: 16px; flex-wrap: wrap; }
+        .btn { background: var(--surface-hover); border: none; color: var(--text); padding: 14px 24px; border-radius: 30px; cursor: pointer; font-size: 0.9rem; display: flex; align-items: center; gap: 8px; transition: all 0.3s ease; font-weight: 500; }
+        .btn:hover { background: var(--accent); color: #fff; box-shadow: 0 4px 20px var(--glow); transform: translateY(-2px); }
+        .btn:active { transform: translateY(0) scale(0.98); }
+        .btn-mic { width: 50px; height: 50px; border-radius: 50%; padding: 0; justify-content: center; flex-shrink: 0; }
+        .btn-mic.recording { background: var(--accent); animation: pulse 1s infinite; }
+        @keyframes pulse { 0%, 100% { box-shadow: 0 0 0 0 var(--glow); } 50% { box-shadow: 0 0 0 15px rgba(232, 93, 4, 0); } }
+.note-card { background: linear-gradient(145deg, #252525, #1e1e1e); border-radius: 4px; padding: 25px 20px 20px 20px; margin-bottom: 15px; position: relative; border: none; transition: all 0.3s ease; animation: slideIn 0.4s ease-out; box-shadow: 4px 4px 10px rgba(0,0,0,0.4), -2px -2px 8px rgba(60,60,60,0.1); cursor: grab; min-height: 100px; }
+        .note-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 6px; background: linear-gradient(90deg, var(--accent), #ff8534); border-radius: 4px 4px 0 0; }
+        .note-card .date { font-size: 0.65rem; color: var(--text-dim); margin-bottom: 10px; margin-top: 5px; }
+        .note-card .content { white-space: pre-wrap; line-height: 1.7; margin: 15px 0; font-size: 1.02rem; }
+        .note-photo { max-width: 100%; border-radius: 8px; margin-bottom: 10px; }
+        .note-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 15px; }
+        .note-actions button { background: rgba(255,255,255,0.05); border: 1px solid var(--border); color: var(--text-dim); padding: 10px 12px; border-radius: 20px; cursor: pointer; font-size: 0.8rem; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; }
+        .note-actions button:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
+        .note-actions button:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
+        .ai-thinking { display: none; padding: 30px 20px; text-align: center; color: var(--accent); }
+        .ai-thinking.active { display: block; animation: blink 1.5s infinite; }
+        @keyframes blink { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
+        .empty { text-align: center; color: var(--text-dim); padding: 40px 20px; }
+        .edit-modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: var(--bg); z-index: 200; padding: 20px; overflow-y: auto; }
+        .edit-modal.active { display: block; }
+        .edit-modal h2 { font-size: 1rem; font-weight: 300; margin-bottom: 20px; letter-spacing: 2px; }
+        .edit-modal textarea { width: 100%; background: var(--surface); border: none; color: var(--text); font-size: 1rem; resize: none; min-height: 50vh; padding: 20px; border-radius: 12px; outline: none; line-height: 1.6; }
+        .edit-modal .controls { margin-top: 20px; justify-content: flex-end; }
+        .toast { position: fixed; bottom: 20px; right: 20px; background: var(--surface); color: var(--text); padding: 6px 10px; border-radius: 6px; font-size: 0.75rem; opacity: 0; transition: all 0.2s ease; pointer-events: none; z-index: 300; box-shadow: 0 2px 10px rgba(0,0,0,0.3); border: 1px solid var(--border); margin-bottom: 20px; display: flex; align-items: center; gap: 4px; }
+        .toast.show { opacity: 0.8; }
+        .search-box { margin-bottom: 20px; }
+        .search-box input { background: var(--surface); }
+        .no-results { text-align: center; color: var(--text-dim); padding: 30px; }
+        .tags-bar { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 15px; padding: 10px 0; }
+        .tag { background: var(--surface-hover); border: 1px solid var(--border); color: var(--text-dim); padding: 6px 14px; border-radius: 20px; font-size: 0.75rem; cursor: pointer; transition: all 0.2s; }
+        .tag:hover, .tag.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+        .note-card .tags { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
+        .note-card .tag { padding: 4px 10px; font-size: 0.7rem; }
+        .tag-input-wrapper { display: flex; gap: 8px; margin-top: 10px; }
+        .tag-input-wrapper input { flex: 1; padding: 10px 14px; background: var(--bg); border: 1px solid var(--border); color: var(--text); border-radius: 20px; font-size: 0.85rem; }
+        .tag-input-wrapper input:focus { border-color: var(--accent); outline: none; box-shadow: 0 0 0 3px var(--glow); }
+        .add-tag-btn { padding: 10px 16px; background: var(--surface-hover); border: 1px solid var(--border); color: var(--text-dim); border-radius: 20px; cursor: pointer; font-size: 0.85rem; }
+        .add-tag-btn:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
+    </style>
+    </style>
+</head>
+<body>
+    <header><h1>LISTEN ARTEFAKT</h1></header>
+    <nav>
+        <button class="active" data-view="create">Заметки</button>
+        <button data-view="history">Чат</button>
+        <button data-view="settings">Настройки</button>
+    </nav>
+    <main>
+        <div id="create" class="view active">
+            <div class="input-area">
+                <textarea id="noteInput" placeholder="Напишите заметку или нажмите на микрофон..."></textarea>
+                <div style="margin-top: 10px;"><input type="text" id="promptInput" placeholder="Что добавить/улучшить (необязательно)"></div>
+                <div class="controls">
+                    <button class="btn btn-mic" id="micBtn">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+                            <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                            <line x1="12" y1="19" x2="12" y2="23"/>
+                            <line x1="8" y1="23" x2="16" y2="23"/>
+                        </svg>
+                    </button>
+                    <button class="btn" id="photoBtn">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                            <circle cx="8.5" cy="8.5" r="1.5"/>
+                            <polyline points="21 15 16 10 5 21"/>
+                        </svg>
+                    </button>
+                    <input type="file" id="photoInput" accept="image/*" style="display:none">
+                    <button class="btn" id="saveBtn">Сохранить</button>
+                </div>
+            </div>
+            <div id="photoPreview" style="display:none; margin-top:15px"><img id="previewImg" style="max-width:100%;max-height:200px;border-radius:12px"><button class="btn" id="removePhoto" style="margin-top:10px;padding:8px 16px;font-size:0.8rem">Удалить фото</button></div>
+            <div class="search-box"><input type="text" id="searchInput" placeholder="Поиск заметок..."></div>
+            <div class="tags-bar" id="tagsBar"></div>
+            <div class="ai-thinking" id="thinking"><span>ИИ обрабатывает...</span></div>
+            <div id="notesList"></div>
+        </div>
+        <div id="history" class="view"><div id="historyList"></div></div>
+        <div id="settings" class="view">
+            <div class="input-area">
+                <p style="color:var(--text-dim);margin-bottom:15px">API ключ для ИИ:</p>
+                <input type="text" id="apiKeyInput" placeholder="sk-or-...">
+                <button class="btn" id="saveKeyBtn" style="margin-top:15px">Сохранить</button>
+            </div>
+            <p style="text-align:center;color:var(--text-dim);font-size:0.65rem;margin-top:30px">By Векшин Алексей</p>
+        </div>
+    </main>
+    <div class="edit-modal" id="editModal"><h2>Редактирование</h2><textarea id="editText"></textarea><div class="tag-input-wrapper" style="margin-top:15px"><input type="text" id="tagInput" placeholder="Теги через запятую"><button class="add-tag-btn" id="addTagBtn">+</button></div><div id="editTags" class="tags" style="margin-top:10px"></div><div class="controls"><button class="btn" id="cancelEdit">Отмена</button><button class="btn" id="saveEdit">Сохранить</button></div></div>
+    <div class="toast" id="toast"></div>
+    <script>
+        let API_KEY = localStorage.getItem('listenApiKey') || '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';
+        let notes = JSON.parse(localStorage.getItem('listenNotes') || '[]');
+        let currentNoteId = null, recognition = null, isRecording = false, searchQuery = '', tagFilter = '';
+
+        document.getElementById('saveKeyBtn').addEventListener('click', () => { localStorage.setItem('listenApiKey', document.getElementById('apiKeyInput').value.trim()); showToast('ok'); });
+        const initSpeechRecognition = () => { const SR = window.SpeechRecognition || window.webkitSpeechRecognition; if (!SR) return null; const r = new SR(); r.lang = 'ru-RU'; r.interimResults = true; r.continuous = true; r.onresult = e => { let t = ''; for (let i = e.resultIndex; i < e.results.length; i++) t += e.results[i][0].transcript; document.getElementById('noteInput').value = t; }; r.onend = () => micBtn.classList.remove('recording'); return r; };
+        const showToast = msg => { 
+            const t = document.getElementById('toast'); 
+            const icons = {ok: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>', err: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#e85d04" stroke-width="3"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>', del: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>'};
+            t.innerHTML = icons[msg] || icons.ok;
+            t.classList.add('show'); 
+            setTimeout(() => t.classList.remove('show'), 1500); 
+        };
+        const saveNotes = () => localStorage.setItem('listenNotes', JSON.stringify(notes));
+        const formatDate = ts => new Date(ts).toLocaleString('ru-RU', {day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'});
+        const fileToBase64 = f => new Promise(r => { const rd = new FileReader(); rd.onload = () => r(rd.result); rd.readAsDataURL(f); });
+
+const renderTagsBar = () => {
+            const allTags = [...new Set(notes.flatMap(n => n.tags || []))];
+            const bar = document.getElementById('tagsBar');
+            bar.innerHTML = `<span class="tag ${!tagFilter ? 'active' : ''}" data-tag="">Все</span>` +
+                allTags.map(t => `<span class="tag ${tagFilter === t ? 'active' : ''}" data-tag="${t}">${t}</span>`).join('');
+            bar.querySelectorAll('.tag').forEach(t => t.addEventListener('click', () => {
+                tagFilter = t.dataset.tag;
+                renderTagsBar();
+                renderNotes();
+            }));
+        };
+
+        const renderNotes = () => {
+            let filtered = notes;
+            if (searchQuery) filtered = filtered.filter(n => n.text.toLowerCase().includes(searchQuery.toLowerCase()));
+            if (tagFilter) filtered = filtered.filter(n => n.tags && n.tags.includes(tagFilter));
+            const pinned = filtered.filter(n => n.pinned).reverse();
+            const unpinned = filtered.filter(n => !n.pinned).reverse();
+const sorted = [...pinned, ...unpinned];
+            document.getElementById('notesList').innerHTML = sorted.length ? sorted.map(n => {
+                const tagsHtml = (n.tags || []).map(t => `<span class="tag">${t}</span>`).join('');
+                const isSelected = selectedNotes.has(n.id);
+                return `<div class="note-card ${n.pinned ? 'pinned' : ''} ${isSelected ? 'selected' : ''}" data-id="${n.id}" draggable="true"><div class="note-header" style="display:flex;align-items:center"><div class="checkbox ${isSelected ? 'checked' : ''}" data-id="${n.id}"></div><div class="date">${formatDate(n.created)}</div></div>${tagsHtml ? `<div class="tags">${tagsHtml}</div>` : ''}${n.photo?`<img src="${n.photo}" class="note-photo">`:''}<div class="content">${n.text}</div><div class="note-actions"><button class="pinBtn ${n.pinned ? 'pinned' : ''}" data-id="${n.id}"><svg width="14" height="14" viewBox="0 0 24 24" fill="${n.pinned ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2"><path d="M12 2L8 6H4v4l-4 4 4 4v4h4l4 4 4-4h4v-4l4-4-4-4V6h-4l-4-4z"/></svg></button><button class="editBtn" data-id="${n.id}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button><button class="regenBtn" data-id="${n.id}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg></button><button class="deleteBtn" data-id="${n.id}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button></div></div>`;
+            }).join('') : '<div class="no-results">Ничего не найдено</div>';
+            initDrag();
+            if (selectMode) document.getElementById('notesList').classList.add('select-mode');
+            else document.getElementById('notesList').classList.remove('select-mode');
+        };
+
+        const renderHistory = () => {
+            document.getElementById('historyList').innerHTML = notes.length ? notes.slice().reverse().map(n => `<div class="note-card"><div class="date">${formatDate(n.created)}</div><div class="content">${n.text}</div></div>`).join('') : '<div class="empty">empty</div>';
+        };
+
+        const initDrag = () => {
+            let dragged = null;
+            document.querySelectorAll('.note-card').forEach(c => {
+                c.draggable = true;
+                c.addEventListener('dragstart', e => { dragged = c; setTimeout(() => c.classList.add('dragging'), 0); });
+                c.addEventListener('dragend', () => { setTimeout(() => c.classList.remove('dragging'), 0); dragged = null; });
+                c.addEventListener('dragover', e => { e.preventDefault(); if (dragged && dragged !== c) { const r = c.getBoundingClientRect(); c.parentNode.insertBefore(dragged, e.clientY < r.top + r.height/2 ? c : c.nextSibling); } });
+            });
+        };
+
+const improveWithAI = async (text, noteId, customPrompt = '') => {
+            if (!API_KEY.startsWith('sk-or-')) return showToast('need key');
+            const thinking = document.getElementById('thinking'); thinking.classList.add('active');
+            try {
+                let prompt;
+                if (customPrompt.trim()) {
+                    prompt = customPrompt.trim();
+                } else {
+                    prompt = `Исправь только орфографию, пунктуацию и грамматику в тексте. НЕ добавляй ничего от себя, НЕ объясняй изменения, НЕ описывай что было исправлено. Выведи ТОЛЬКО исправленный текст. Текст: """${text}"""`;
+                }
+                const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {method:'POST',headers:{'Content-Type':'application/json','Authorization':`Bearer ${API_KEY}`},body:JSON.stringify({model:'deepseek/deepseek-chat',messages:[{role:'user',content:prompt}],max_tokens:512})});
+                const data = await res.json();
+                if (data.error) throw new Error(data.error.message);
+                const note = notes.find(n => n.id === noteId); if (note) { note.text = data.choices[0].message.content; note.improved = true; saveNotes(); renderNotes(); showToast('ok'); }
+            } catch(e) { console.error(e); showToast('err'); }
+            finally { thinking.classList.remove('active'); }
+        };
+
+        document.querySelectorAll('nav button').forEach(b => b.addEventListener('click', () => { 
+            document.querySelectorAll('nav button').forEach(x => x.classList.remove('active')); 
+            document.querySelectorAll('.view').forEach(x => x.classList.remove('active')); 
+            b.classList.add('active'); 
+            document.getElementById(b.dataset.view).classList.add('active'); 
+            if(b.dataset.view === 'history') renderHistory();
+        }));
+
+        document.getElementById('saveBtn').addEventListener('click', async () => {
+            const text = document.getElementById('noteInput').value.trim(); const photo = document.getElementById('photoInput').files[0];
+            if (!text && !photo) return showToast('err');
+            const id = Date.now(); const note = {id, text, photo:photo?await fileToBase64(photo):null, created:id, improved:false, customPrompt:document.getElementById('promptInput').value.trim(), tags:[], pinned:false};
+            notes.push(note); saveNotes(); document.getElementById('noteInput').value=''; document.getElementById('promptInput').value=''; document.getElementById('photoInput').value=''; document.getElementById('photoPreview').style.display='none';
+            if (photo) { note.text = 'Фото сохранено'; saveNotes(); renderNotes(); }
+            if (text) improveWithAI(text, id, note.customPrompt);
+            renderTagsBar();
+        });
+
+        document.getElementById('photoBtn').addEventListener('click', () => document.getElementById('photoInput').click());
+        document.getElementById('photoInput').addEventListener('change', e => { if(e.target.files[0]) { const r = new FileReader(); r.onload = () => { document.getElementById('previewImg').src = r.result; document.getElementById('photoPreview').style.display = 'block'; }; r.readAsDataURL(e.target.files[0]); } });
+        document.getElementById('removePhoto').addEventListener('click', () => { document.getElementById('photoInput').value = ''; document.getElementById('photoPreview').style.display = 'none'; });
+        document.getElementById('notesList').addEventListener('click', async e => { 
+            const btn = e.target.closest('button');
+            if(!btn) return;
+            const id = parseInt(btn.dataset?.id); 
+            if(!id) return;
+            if(btn.classList.contains('deleteBtn')) { notes = notes.filter(n => n.id !== id); saveNotes(); renderNotes(); renderTagsBar(); showToast('del'); } 
+            else if(btn.classList.contains('pinBtn')) { const n = notes.find(x=>x.id===id); if(n) { n.pinned = !n.pinned; saveNotes(); renderNotes(); } }
+            else if(btn.classList.contains('editBtn')) { currentNoteId = id; const n = notes.find(x=>x.id===id); document.getElementById('editText').value = n.text; renderEditTags(id); document.getElementById('editModal').classList.add('active'); } 
+else if(btn.classList.contains('regenBtn')) { const n = notes.find(x=>x.id===id); await improveWithAI(n.text, id, n.customPrompt); } 
+        });
+
+        document.getElementById('cancelEdit').addEventListener('click', () => document.getElementById('editModal').classList.remove('active'));
+
+        const micBtn = document.getElementById('micBtn');
+        micBtn.addEventListener('click', () => { if(!recognition) { recognition = initSpeechRecognition(); if(!recognition) return showToast('Голос недоступен'); } if(isRecording) { recognition.stop(); isRecording = false; } else { document.getElementById('noteInput').value = ''; recognition.start(); isRecording = true; micBtn.classList.add('recording'); } });
+
+        const searchInput = document.getElementById('searchInput');
+        if (searchInput) {
+            searchInput.addEventListener('input', e => { searchQuery = e.target.value; renderNotes(); });
+        }
+
+renderTagsBar();
+        renderNotes();
+
+        document.getElementById('selectModeBtn').addEventListener('click', () => {
+            selectMode = !selectMode;
+            if (!selectMode) selectedNotes.clear();
+            renderNotes();
+            updateBulkActions();
+        });
+
+    </script>
+</body>
+</html>
