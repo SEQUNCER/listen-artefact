@@ -188,7 +188,7 @@ const improveWithAI = async (text, noteId, customPrompt = '') => {
             try {
                 let prompt;
                 if (customPrompt.trim()) {
-                    prompt = customPrompt.trim();
+                    prompt = `Заметка: """${text}"""\n\nЗапрос пользователя: ${customPrompt.trim()}`;
                 } else {
                     prompt = `Исправь только орфографию, пунктуацию и грамматику в тексте. НЕ добавляй ничего от себя, НЕ объясняй изменения, НЕ описывай что было исправлено. Выведи ТОЛЬКО исправленный текст. Текст: """${text}"""`;
                 }
