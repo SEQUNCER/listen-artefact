@@ -120,6 +120,8 @@
         let API_KEY = localStorage.getItem('listenApiKey') || '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';
         let notes = JSON.parse(localStorage.getItem('listenNotes') || '[]');
         let currentNoteId = null, recognition = null, isRecording = false, searchQuery = '', tagFilter = '';
+        let selectMode = false;
+        let selectedNotes = new Set();
 
         document.getElementById('saveKeyBtn').addEventListener('click', () => { localStorage.setItem('listenApiKey', document.getElementById('apiKeyInput').value.trim()); showToast('ok'); });
         const initSpeechRecognition = () => { const SR = window.SpeechRecognition || window.webkitSpeechRecognition; if (!SR) return null; const r = new SR(); r.lang = 'ru-RU'; r.interimResults = true; r.continuous = true; r.onresult = e => { let t = ''; for (let i = e.resultIndex; i < e.results.length; i++) t += e.results[i][0].transcript; document.getElementById('noteInput').value = t; }; r.onend = () => micBtn.classList.remove('recording'); return r; };
