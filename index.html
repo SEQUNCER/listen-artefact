@@ -192,7 +192,7 @@ const improveWithAI = async (text, noteId, customPrompt = '') => {
                 } else {
                     prompt = `Исправь только орфографию, пунктуацию и грамматику в тексте. НЕ добавляй ничего от себя, НЕ объясняй изменения, НЕ описывай что было исправлено. Выведи ТОЛЬКО исправленный текст. Текст: """${text}"""`;
                 }
-                const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {method:'POST',headers:{'Content-Type':'application/json','Authorization':`Bearer ${API_KEY}`},body:JSON.stringify({model:'deepseek/deepseek-chat',messages:[{role:'user',content:prompt}],max_tokens:512})});
+                const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {method:'POST',headers:{'Content-Type':'application/json','Authorization':`Bearer ${API_KEY}`},body:JSON.stringify({model:'minimax/minimax-m2.5:free',messages:[{role:'user',content:prompt}],max_tokens:512})});
                 const data = await res.json();
                 if (data.error) throw new Error(data.error.message);
                 const note = notes.find(n => n.id === noteId); if (note) { note.text = data.choices[0].message.content; note.improved = true; saveNotes(); renderNotes(); showToast('ok'); }
