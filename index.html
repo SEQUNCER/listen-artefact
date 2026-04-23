@@ -118,6 +118,9 @@
     <div class="toast" id="toast"></div>
     <script>
         let API_KEY = localStorage.getItem('listenApiKey') || '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';
+        if (!localStorage.getItem('listenApiKey')) {
+            localStorage.setItem('listenApiKey', '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');
+        }
         let notes = JSON.parse(localStorage.getItem('listenNotes') || '[]');
         let currentNoteId = null, recognition = null, isRecording = false, searchQuery = '', tagFilter = '';
         let selectMode = false;
